@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Usuarios</title>
+    <link rel="stylesheet" href="cucu.css">
+</head>
+<body>
+    <h1>Registro de Usuarios</h1>
+    <form id="registroForm">
+        <input type="text" id="nombre" placeholder="Nombre" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="codigo" placeholder="Código" required>
+        <input type="password" id="contrasena" placeholder="Contraseña" required>
+        <button type="submit">Registrar</button>
+    </form>
+
+    <h2>Usuarios Registrados</h2>
+    <ul id="listaUsuarios"></ul>
+
+    <h1>Buscar Usuario por Código</h1>
+    <form id="buscarForm">
+        <input type="text" id="buscarCodigo" placeholder="Código" required>
+        <button type="submit">Buscar</button>
+    </form>
+    <div id="usuarioInfo"></div>
+
+    <script>
+        document.getElementById('registroForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+            const codigo = document.getElementById('codigo').value;
+            const contrasena = document.getElementById('contrasena').value;
+
+            const fechaRegistro = new Date().toISOString().split('T')[0];
+            const fechaVencimiento = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0];
+
+            try {
+                const response = await fetch('/usuarios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre, email, codigo, contrasena, fechaRegistro, fechaVencimiento })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert('Usuario registrado con éxito');
+                    agregarUsuarioALista(data);
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert('Error registrando usuario');
+            }
+        });
+
+        document.getElementById('buscarForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const codigo = document.getElementById('buscarCodigo').value;
+
+            try {
+                const response = await fetch(`/usuarios/${codigo}`);
+                const usuario = await response.json();
+                const usuarioInfo = document.getElementById('usuarioInfo');
+                if (usuario.error) {
+                    usuarioInfo.textContent = usuario.error;
+                    usuarioInfo.className = 'error';
+                } else {
+                    usuarioInfo.textContent = `Nombre: ${usuario.nombre}, Email: ${usuario.email}, Fecha de Registro: ${usuario.fechaRegistro}, Fecha de Vencimiento: ${usuario.fechaVencimiento}`;
+                    usuarioInfo.className = '';
+                }
+            } catch (error) {
+                const usuarioInfo = document.getElementById('usuarioInfo');
+                usuarioInfo.textContent = 'Error buscando usuario';
+                usuarioInfo.className = 'error';
+            }
+        });
+
+        function agregarUsuarioALista(usuario) {
+            const listaUsuarios = document.getElementById('listaUsuarios');
+            const li = document.createElement('li');
+            li.textContent = `Nombre: ${usuario.nombre}, Email: ${usuario.email}, Código: ${usuario.codigo}, Fecha de Registro: ${usuario.fechaRegistro}, Fecha de Vencimiento: ${usuario.fechaVencimiento}`;
+            listaUsuarios.appendChild(li);
+        }
+    </script>
+</body>
+</html>
