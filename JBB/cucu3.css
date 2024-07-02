@@ -1,0 +1,17 @@
+/* styles.css */
+
+.success-message {
+    background-color: #dff0d8; /* Color de fondo verde claro */
+    border: 1px solid #d0e9c6; /* Borde verde */
+    color: #3c763d; /* Color de texto verde oscuro */
+    padding: 10px 15px; /* Espaciado interno */
+    margin-bottom: 20px; /* Margen inferior */
+    border-radius: 4px; /* Bordes redondeados */
+    text-align: center; /* Centrar texto */
+}
+
+@media (max-width: 768px) {
+    .success-message {
+        font-size: 14px; /* Tamaño de fuente más pequeño en dispositivos móviles */
+    }
+}
